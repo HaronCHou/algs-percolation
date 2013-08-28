@@ -1,7 +1,6 @@
 
 /**
- * Blocked sites are marked by -1, while open sites are non-negatives
- * numbers representing themselves or their root
+ *  
  */
 
 enum SiteState { BLOCKED, OPEN }
@@ -28,21 +27,10 @@ public class Percolation {
         // Initilize all sites to be blocked.
         for (int i = 1; i <= site_count; i++)
             state[i] = SiteState.BLOCKED;
-        // Initilize virtual top site and bottom site as open state
-        state[0] = SiteState.OPEN;
-        state[site_count+1] = SiteState.OPEN;
+        // Initilize virtual top and bottom site with open state
+        state[0] = state[site_count+1] = SiteState.OPEN;
         
         fileout.println(this.N);
-        //checkGrid();
-    }
-
-    private void checkGrid() {
-        for (int i = 0; i < state.length; i++) {
-            System.out.printf("%.1s ", state[i].toString());
-            if (i % N == 0)
-                System.out.println();
-        }
-        System.out.println();
     }
 
     // return array index of given row i and column j
@@ -69,15 +57,14 @@ public class Percolation {
     public void open(int i, int j) {
         // All input sites are blocked at first. Check the state of site before invoking
         // this method.
-        // TODO: Position array index.
         int idx, iaround;
 
         idx = xyToIndex(i, j);
-        //System.out.printf("row %d and column %d create index %d\n", i, j, idx);
         fileout.printf("%d %d\n", i, j);
-        // Mark the array content to be the array index.
         state[idx] = SiteState.OPEN;
-        // Traverse surrounding sites, connect all open ones. Make sure we do not index sites out of bouns
+
+        // Traverse surrounding sites, connect all open ones. 
+        // Make sure we do not index sites out of bouns
         if (i != 1) { 
             iaround = xyToIndex(i - 1, j);
             if (isOpen(i - 1, j)) grid.union(idx, iaround);
@@ -101,17 +88,14 @@ public class Percolation {
 
     // is site (row i, column j) open?
     public boolean isOpen(int i, int j) {
-        // Position array index
-        // Array content is non-negatives if site is open
+        // just check the state of site
         int idx = xyToIndex(i, j);
         return state[idx] == SiteState.OPEN;
     }
 
     // is site (row i, column j) full?
     public boolean isFull(int i, int j) {
-        // Position array index
-        // Check if this site is open
-        // TODO: Check if the the site is connected to the virtual top site
+        // Check if this site is connected to virtual top site
         int idx = xyToIndex(i, j);
         return grid.connected(0, idx);
     }
@@ -128,14 +112,12 @@ public class Percolation {
         int row, column;
 
         do {
-            //  generate random row and column numbers between 1~N
+            // generate random row and column numbers between 1~N
             row     = StdRandom.uniform(1, pl.N+1);
             column  = StdRandom.uniform(1, pl.N+1);
             if(pl.isOpen(row, column))
                 continue;
             pl.open(row, column);
-            //pl.checkGrid();
         } while (!pl.percolates());
-        pl.checkGrid();
     }
 }
