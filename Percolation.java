@@ -11,12 +11,11 @@ public class Percolation {
     private Out     fileout;
     private SiteState[] state;
     private int     N;
-    private int     site_count;
 
     // create N-by-N grid, with all sites blocked
     public Percolation(int N) {
 
-        site_count = N * N;
+        int site_count = N * N;
         this.N = N;
 
         // index 0 and N^2+1 are reserved for virtual top and bottom sites
@@ -55,40 +54,25 @@ public class Percolation {
 
     // open site (row i, column j) if it is not already
     public void open(int i, int j) {
-        // All input sites are blocked at first. Check the state of site before invoking
-        // this method.
-        int idx, iaround;
-
-        idx = xyToIndex(i, j);
+        // All input sites are blocked at first. 
+        // Check the state of site before invoking this method.
+        int idx = xyToIndex(i, j);
         fileout.printf("%d %d\n", i, j);
         state[idx] = SiteState.OPEN;
 
         // Traverse surrounding sites, connect all open ones. 
-        // Make sure we do not index sites out of bouns
-        if (i != 1) { 
-            iaround = xyToIndex(i - 1, j);
-            if (isOpen(i - 1, j)) grid.union(idx, iaround);
-        }
-        if (i != N) { 
-            iaround = xyToIndex(i + 1, j);
-            if (isOpen(i + 1, j)) grid.union(idx, iaround);
-        }
-        if (j != 1) { 
-            iaround = xyToIndex(i, j - 1);
-            if (isOpen(i, j - 1)) grid.union(idx, iaround);
-        }
-        if (j != N) { 
-            iaround = xyToIndex(i, j + 1);
-            if (isOpen(i, j + 1)) grid.union(idx, iaround);
-        }
+        // Make sure we do not index sites out of bounds.
+        if (i != 1 && isOpen(i-1, j)) grid.union(idx, xyToIndex(i-1, j));
+        if (i != N && isOpen(i+1, j)) grid.union(idx, xyToIndex(i+1, j));
+        if (j != 1 && isOpen(i, j-1)) grid.union(idx, xyToIndex(i, j-1));
+        if (j != N && isOpen(i, j+1)) grid.union(idx, xyToIndex(i, j+1));
         // if site is on top or bottom, connect to corresponding virtual site.
         if (isTopSite(idx))     grid.union(0, idx);
-        if (isBottomSite(idx))  grid.union(site_count+1, idx);
+        if (isBottomSite(idx) && isFull(i, j))  grid.union(state.length-1, idx);
     }
 
     // is site (row i, column j) open?
     public boolean isOpen(int i, int j) {
-        // just check the state of site
         int idx = xyToIndex(i, j);
         return state[idx] == SiteState.OPEN;
     }
@@ -102,12 +86,11 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        // Check whether virtual top site and virtual bottom site are connected
-        return grid.connected(0, site_count+1);
+        // Check whether virtual top and bottom sites are connected
+        return grid.connected(0, state.length-1);
     }
 
     public static void main(String[] args) {
-        // create a percolation object
         Percolation pl = new Percolation(Integer.parseInt(args[0]));
         int row, column;
 
