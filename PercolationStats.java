@@ -1,7 +1,4 @@
 
-import java.math.*;
-import java.lang.*;
-
 public class PercolationStats {
     
     private double[]    threshold;
@@ -9,26 +6,27 @@ public class PercolationStats {
     // perform T independent computational experiments on an N-by-N grid
     public PercolationStats(int N, int T) {
 
+        int openCount, row, column;
+
         if (N <= 0 || T <= 0)
             throw new IllegalArgumentException("Arguments out of bound");
 
         threshold = new double[T];
         
-        int open_count, row, column;
+        openCount = 0;
         for (int i = 0; i < T; i++) {
             Percolation pl = new Percolation(N);
             do {
                 row     = StdRandom.uniform(1, N+1);
                 column  = StdRandom.uniform(1, N+1);
-                if(pl.isOpen(row, column))
+                if (pl.isOpen(row, column))
                     continue;
                 pl.open(row, column);
-                open_count++;
+                openCount++;
             } while (!pl.percolates());
 
-            threshold[i] = (double) open_count / (N * N);
-            open_count = 0;
-            System.out.printf("threshold[%d] = %f\n", i, threshold[i]);
+            threshold[i] = (double) openCount / (N * N);
+            openCount = 0;
         }
     }
 
@@ -43,26 +41,27 @@ public class PercolationStats {
     }
 
     private double halfInterval() {
-    	return 1.96 * stddev() / Math.sqrt(threshold.length);
+        return 1.96 * stddev() / Math.sqrt(threshold.length);
     }
     
     // returns lower bound of the 95% confidence interval
     public double confidenceLo() {
-    	return mean() - halfInterval();
+        return mean() - halfInterval();
     }
     
     // returns upper bound of the 95% confidence interval
     public double confidenceHi() {
-    	return mean() + halfInterval();
+        return mean() + halfInterval();
     }
     
     // test client, described below
     public static void main(String[] args) {
-    	PercolationStats pls = 
-            new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        PercolationStats pls = new PercolationStats(Integer.parseInt(args[0]),
+                    Integer.parseInt(args[1]));
 
         System.out.printf("mean                     = %f\n", pls.mean());
         System.out.printf("stddev                   = %f\n", pls.stddev());
-        System.out.printf("95%% confidence Interval  = %f, %f\n", pls.confidenceLo(), pls.confidenceHi());
+        System.out.printf("95%% confidence Interval  = %f, %f\n",
+                pls.confidenceLo(), pls.confidenceHi());
     }
 }
