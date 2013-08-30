@@ -2,7 +2,6 @@
 public class Percolation {
     
     private WeightedQuickUnionUF grid;
-    private Out     fileout;
     private boolean[]   state;
     private int     N;
 
@@ -15,16 +14,13 @@ public class Percolation {
         // index 0 and N^2+1 are reserved for virtual top and bottom sites
         grid    = new WeightedQuickUnionUF(siteCount + 2);
         state   = new boolean[siteCount + 2];
-        fileout = new Out("test.txt");
 
-        // Initilize all sites to be blocked.
+        // Initialize all sites to be blocked.
         for (int i = 1; i <= siteCount; i++)
             state[i] = false;
-        // Initilize virtual top and bottom site with open state
+        // Initialize virtual top and bottom site with open state
         state[0] = true;
         state[siteCount+1] = true;
-        
-        fileout.println(this.N);
     }
 
     // return array index of given row i and column j
@@ -52,7 +48,6 @@ public class Percolation {
         // All input sites are blocked at first. 
         // Check the state of site before invoking this method.
         int idx = xyToIndex(i, j);
-        fileout.printf("%d %d\n", i, j);
         state[idx] = true;
 
         // Traverse surrounding sites, connect all open ones. 
@@ -62,8 +57,8 @@ public class Percolation {
         if (j != 1 && isOpen(i, j-1)) grid.union(idx, xyToIndex(i, j-1));
         if (j != N && isOpen(i, j+1)) grid.union(idx, xyToIndex(i, j+1));
         // if site is on top or bottom, connect to corresponding virtual site.
-        if (isTopSite(idx))                     grid.union(0, idx);
-        if (isBottomSite(idx) && isFull(i, j))  grid.union(state.length-1, idx);
+        if (isTopSite(idx))     grid.union(0, idx);
+        if (isBottomSite(idx))  grid.union(state.length-1, idx);
     }
 
     // is site (row i, column j) open?
@@ -83,19 +78,5 @@ public class Percolation {
     public boolean percolates() {
         // Check whether virtual top and bottom sites are connected
         return grid.connected(0, state.length-1);
-    }
-
-    public static void main(String[] args) {
-        Percolation pl = new Percolation(Integer.parseInt(args[0]));
-        int row, column;
-
-        do {
-            // generate random row and column numbers between 1~N
-            row     = StdRandom.uniform(1, pl.N+1);
-            column  = StdRandom.uniform(1, pl.N+1);
-            if (pl.isOpen(row, column))
-                continue;
-            pl.open(row, column);
-        } while (!pl.percolates());
     }
 }

@@ -27,6 +27,7 @@ public class PercolationStats {
 
             threshold[i] = (double) openCount / (N * N);
             openCount = 0;
+            //System.out.printf("threshold[%03d] = %f\n", i, threshold[i]);
         }
     }
 
