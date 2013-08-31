@@ -1,7 +1,7 @@
 
 public class Percolation {
     
-    private WeightedQuickUnionUF grid;
+    private WeightedQuickUnionUF grid, auxGrid;
     private boolean[]   state;
     private int     N;
 
@@ -13,6 +13,7 @@ public class Percolation {
 
         // index 0 and N^2+1 are reserved for virtual top and bottom sites
         grid    = new WeightedQuickUnionUF(siteCount + 2);
+        auxGrid = new WeightedQuickUnionUF(siteCount + 1);
         state   = new boolean[siteCount + 2];
 
         // Initialize all sites to be blocked.
@@ -52,12 +53,27 @@ public class Percolation {
 
         // Traverse surrounding sites, connect all open ones. 
         // Make sure we do not index sites out of bounds.
-        if (i != 1 && isOpen(i-1, j)) grid.union(idx, xyToIndex(i-1, j));
-        if (i != N && isOpen(i+1, j)) grid.union(idx, xyToIndex(i+1, j));
-        if (j != 1 && isOpen(i, j-1)) grid.union(idx, xyToIndex(i, j-1));
-        if (j != N && isOpen(i, j+1)) grid.union(idx, xyToIndex(i, j+1));
+        if (i != 1 && isOpen(i-1, j)) {
+            grid.union(idx, xyToIndex(i-1, j));
+            auxGrid.union(idx, xyToIndex(i-1, j));
+        }
+        if (i != N && isOpen(i+1, j)) {
+            grid.union(idx, xyToIndex(i+1, j));
+            auxGrid.union(idx, xyToIndex(i+1, j));
+        }
+        if (j != 1 && isOpen(i, j-1)) {
+            grid.union(idx, xyToIndex(i, j-1));
+            auxGrid.union(idx, xyToIndex(i, j-1));
+        }
+        if (j != N && isOpen(i, j+1)) {
+            grid.union(idx, xyToIndex(i, j+1));
+            auxGrid.union(idx, xyToIndex(i, j+1));
+        }
         // if site is on top or bottom, connect to corresponding virtual site.
-        if (isTopSite(idx))     grid.union(0, idx);
+        if (isTopSite(idx)) {
+            grid.union(0, idx);
+            auxGrid.union(0, idx);
+        }
         if (isBottomSite(idx))  grid.union(state.length-1, idx);
     }
 
@@ -71,7 +87,7 @@ public class Percolation {
     public boolean isFull(int i, int j) {
         // Check if this site is connected to virtual top site
         int idx = xyToIndex(i, j);
-        return grid.connected(0, idx);
+        return grid.connected(0, idx) && auxGrid.connected(0, idx);
     }
 
     // does the system percolate?
