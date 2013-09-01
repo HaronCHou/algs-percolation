@@ -1,5 +1,5 @@
 #include "percolate.h"
-#include "quick-union.h"
+#include "weighted-quick-union.h"
 #include <stdlib.h>
 #include <stdio.h>
 

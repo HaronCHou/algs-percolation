@@ -1,6 +1,6 @@
 
-#ifndef _QUICK_UNION_H_
-#define _QUICK_UNION_H_
+#ifndef _WEIGHTED_QUICK_UNION_H_
+#define _WEIGHTED_QUICK_UNION_H_
 
 struct qu;
 typedef struct qu* QuickUnion;
